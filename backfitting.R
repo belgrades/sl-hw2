@@ -32,19 +32,24 @@ iter = 1
 max_iter = 200
 rsss = numeric()
 
+# But without practical application, theory soon loses its charm
+# J. Verne - From Earth to the Mooooon.
+
 while(abs(rss0-rss) > tol && iter <= max_iter){
   rss = rss0
   iter = iter + 1
-  rsss = c(rsss, rss)
-  
+
   for(j in 1:p){
     r_j = y - alpha - apply(f, 1, sum) + f[, j]
-    f[, j] = predict(smooth.spline(x = r_j, y = X[,j]), r_j)$y
+    f[, j] = predict(smooth.spline(x = X[, j], y = r_j), X[, j])$y
     f[, j] = f[, j] - mean(f[, j])
   }
   rss0 = sum((y - alpha - apply(f, 1, sum))^2)
+  rsss = c(rsss, rss0)
 }
+
+rss0 = sum((y - alpha - apply(f, 1, sum))^2)
 
 alpha + apply(f, FUN = sum, MARGIN = 1)
 
-plot(1:length(rsss), rsss, type = "l")
+plot(1:length(rsss), rsss, type = "l", lwd = 3, ylim = c(0, rsss[1]+10))
